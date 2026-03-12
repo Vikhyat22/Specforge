@@ -15,6 +15,8 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 const projectsRoutes = require('./routes/projects.routes');
 app.use('/api/projects', projectsRoutes);
+const generateRoutes = require('./routes/generate.routes');
+app.use('/api/generate', generateRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date() });

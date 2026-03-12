@@ -29,6 +29,19 @@ router.post('/', authenticate, async (req, res) => {
   }
 });
 
+router.get('/:id', authenticate, async (req, res) => {
+  try {
+    const { rows } = await query(
+      'SELECT * FROM projects WHERE id = $1 AND user_id = $2',
+      [req.params.id, req.user.userId]
+    );
+    if (!rows.length) return res.status(404).json({ error: 'Project not found' });
+    res.json({ project: rows[0] });
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 router.post('/:id/inputs', authenticate, async (req, res) => {
   try {
     const project_id = req.params.id;

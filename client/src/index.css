@@ -182,7 +182,14 @@ button { cursor: pointer; font-family: 'JetBrains Mono', monospace; }
   gap: 24px;
   align-items: start;
 }
+.spec-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  align-items: start;
+}
 @media (max-width: 900px) {
   .intake-layout { grid-template-columns: 1fr; }
+  .spec-layout   { grid-template-columns: 1fr; }
   .fgrid { grid-template-columns: 1fr; }
 }

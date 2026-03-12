@@ -95,7 +95,7 @@ export default function NewProject() {
         throw new Error(e.error || `Failed to save inputs (${inputsRes.status})`)
       }
 
-      navigate('/dashboard')
+      navigate('/projects/' + project.id)
     } catch (err) {
       setError(err.message)
     } finally {

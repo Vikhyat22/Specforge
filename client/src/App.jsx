@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext'
 import AuthPage from './pages/AuthPage'
 import Dashboard from './pages/Dashboard'
 import NewProject from './pages/NewProject'
+import SpecGen from './pages/SpecGen'
 
 function Landing() {
   return <div>Landing</div>
@@ -17,6 +18,7 @@ export default function App() {
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/projects/new" element={<NewProject />} />
+          <Route path="/projects/:id" element={<SpecGen />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
