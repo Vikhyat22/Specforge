@@ -1,13 +1,11 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import AuthPage from './pages/AuthPage'
+import Dashboard from './pages/Dashboard'
+import NewProject from './pages/NewProject'
 
 function Landing() {
   return <div>Landing</div>
-}
-
-function Dashboard() {
-  return <div>Dashboard</div>
 }
 
 export default function App() {
@@ -18,6 +16,7 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/projects/new" element={<NewProject />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
