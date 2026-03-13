@@ -275,4 +275,101 @@ router.post('/code', authenticate, async (req, res) => {
   }
 });
 
+router.post('/preview', authenticate, async (req, res) => {
+  const { project_id } = req.body;
+  if (!project_id) return res.status(400).json({ error: 'project_id required' });
+
+  try {
+    // verify ownership + get SRS
+    const specRes = await query(
+      `SELECT s.srs_content, p.name, p.industry, p.project_type
+       FROM specifications s
+       JOIN projects p ON p.id = s.project_id
+       WHERE s.project_id = $1 AND p.user_id = $2`,
+      [project_id, req.user.userId]
+    );
+    if (!specRes.rows.length) return res.status(404).json({ error: 'Project not found' });
+    const { srs_content, name, industry, project_type } = specRes.rows[0];
+    if (!srs_content) return res.status(400).json({ error: 'Generate SRS first' });
+
+    // get all code artifacts
+    const artifactsRes = await query(
+      'SELECT artifact_type, content FROM code_artifacts WHERE project_id = $1',
+      [project_id]
+    );
+    const artifacts = {};
+    artifactsRes.rows.forEach(r => { artifacts[r.artifact_type] = r.content; });
+
+    const systemPrompt = `You are a senior frontend engineer. Output a SINGLE complete HTML file. All CSS and JS must be inline. One Google Fonts link is allowed.
+Rules you must follow exactly:
+- Output must start with exactly: <!DOCTYPE html>
+- All data operations must use an in-memory MockAPI. Create a global const STORE = {} at the top of the JS.
+- Pre-seed STORE with 8-10 realistic, domain-specific records based on the industry and project type. No placeholder names like John Doe or example.com.
+- Show demo credentials on the login screen: demo@${industry || 'app'}.app / demo123
+- Use hash-based routing (#/) for all routes defined in the SRS Section 4. Every internal link must use # prefix.
+- Every FR item from SRS Section 3 must have a visible UI element.
+- CRUD operations: create must add to STORE and refresh the list; update must edit in STORE; delete must remove from STORE with a confirm dialog.
+- Apply an industry-appropriate color palette and use domain terminology throughout.
+- No broken buttons. Every interactive element must do something.
+- No explanations. No markdown fences. Output raw HTML only.`;
+
+    const artifactSummary = Object.entries(artifacts)
+      .map(([type, content]) => `--- ${type.toUpperCase()} ---\n${content.slice(0, 1000)}`)
+      .join('\n\n');
+
+    const userPrompt = `Project: ${name}
+Industry: ${industry || 'general'}
+Type: ${project_type || 'web app'}
+SRS (first 4000 chars):
+${srs_content.slice(0, 4000)}
+${artifactSummary ? `Code artifacts (summaries):\n${artifactSummary}` : ''}
+Generate the complete single-file HTML preview now.`;
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no');
+    res.flushHeaders();
+
+    let fullText = '';
+
+    streamCompletion(
+      systemPrompt,
+      userPrompt,
+      // onChunk
+      (chunk) => {
+        fullText += chunk;
+        res.write(`data: ${JSON.stringify({ type: 'chunk', content: chunk })}\n\n`);
+      },
+      // onDone
+      async () => {
+        try {
+          await query(
+            `INSERT INTO code_artifacts (project_id, artifact_type, content)
+             VALUES ($1, $2, $3)
+             ON CONFLICT (project_id, artifact_type) DO UPDATE SET content = $3`,
+            [project_id, 'preview', fullText]
+          );
+        } catch (err) {
+          console.error('Failed to save preview artifact to DB:', err.message);
+        }
+        res.write(`data: ${JSON.stringify({ type: 'done', artifactType: 'preview' })}\n\n`);
+        res.write('data: [DONE]\n\n');
+        res.end();
+      },
+      // onError
+      (errMsg) => {
+        res.write(`data: ${JSON.stringify({ type: 'error', message: errMsg })}\n\n`);
+        res.write('data: [DONE]\n\n');
+        res.end();
+      }
+    );
+  } catch (err) {
+    if (!res.headersSent) return res.status(500).json({ error: err.message });
+    res.write(`data: ${JSON.stringify({ type: 'error', message: err.message })}\n\n`);
+    res.write('data: [DONE]\n\n');
+    res.end();
+  }
+});
+
 module.exports = router;

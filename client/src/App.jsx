@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard'
 import NewProject from './pages/NewProject'
 import SpecGen from './pages/SpecGen'
 import CodeGen from './pages/CodeGen'
+import PreviewPage from './pages/PreviewPage'
 
 function Landing() {
   return <div>Landing</div>
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/projects/new" element={<NewProject />} />
           <Route path="/projects/:id" element={<SpecGen />} />
           <Route path="/projects/:id/code" element={<CodeGen />} />
+          <Route path="/projects/:id/preview" element={<PreviewPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

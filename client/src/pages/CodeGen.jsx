@@ -295,6 +295,21 @@ export default function CodeGen() {
                     ↓ Download All
                   </button>
                 )}
+                {allDone && (
+                  <button
+                    onClick={() => navigate(`/projects/${projectId}/preview`)}
+                    type="button"
+                    style={{
+                      marginTop: 10, width: '100%', padding: '10px',
+                      background: 'var(--lime-dim)', border: '1px solid var(--lime)',
+                      color: 'var(--lime)', borderRadius: 8, cursor: 'pointer',
+                      fontSize: 11, letterSpacing: 2, textTransform: 'uppercase',
+                      fontFamily: 'Syne, sans-serif', fontWeight: 600,
+                    }}
+                  >
+                    ⚡ Generate Preview
+                  </button>
+                )}
               </div>
             </div>
 
