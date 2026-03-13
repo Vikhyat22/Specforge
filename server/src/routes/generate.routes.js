@@ -2,6 +2,7 @@ const { Router } = require('express');
 const { query } = require('../config/db');
 const authenticate = require('../middleware/auth');
 const { streamCompletion } = require('../services/ai.service');
+const { buildCodePrompt } = require('../services/prompts.service');
 
 const router = Router();
 
@@ -195,6 +196,83 @@ Full form data: ${JSON.stringify(form_data)}`;
       res.end();
     }
   );
+});
+
+router.post('/code', authenticate, async (req, res) => {
+  const { project_id, stage } = req.body;
+  if (!project_id) return res.status(400).json({ error: 'project_id required' });
+  if (!stage || stage < 1 || stage > 5) return res.status(400).json({ error: 'stage must be 1-5' });
+
+  const STAGE_NAMES = { 1: 'database', 2: 'backend', 3: 'frontend-structure', 4: 'frontend-components', 5: 'package' };
+
+  try {
+    // verify ownership + get SRS
+    const specRes = await query(
+      `SELECT s.srs_content FROM specifications s
+       JOIN projects p ON p.id = s.project_id
+       WHERE s.project_id = $1 AND p.user_id = $2`,
+      [project_id, req.user.userId]
+    );
+    if (!specRes.rows.length) return res.status(404).json({ error: 'Project not found' });
+    const { srs_content } = specRes.rows[0];
+    if (!srs_content) return res.status(400).json({ error: 'Generate SRS first' });
+
+    // get previous artifacts
+    const artifactsRes = await query(
+      'SELECT artifact_type, content FROM code_artifacts WHERE project_id = $1',
+      [project_id]
+    );
+    const previousArtifacts = {};
+    artifactsRes.rows.forEach(r => { previousArtifacts[r.artifact_type] = r.content; });
+
+    const { systemPrompt, userPrompt } = buildCodePrompt(stage, srs_content, previousArtifacts);
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no');
+    res.flushHeaders();
+
+    let fullText = '';
+
+    streamCompletion(
+      systemPrompt,
+      userPrompt,
+      // onChunk
+      (chunk) => {
+        fullText += chunk;
+        res.write(`data: ${JSON.stringify({ type: 'chunk', content: chunk })}\n\n`);
+      },
+      // onDone
+      async () => {
+        const artifactType = STAGE_NAMES[stage];
+        try {
+          await query(
+            `INSERT INTO code_artifacts (project_id, artifact_type, content)
+             VALUES ($1, $2, $3)
+             ON CONFLICT (project_id, artifact_type) DO UPDATE SET content = $3`,
+            [project_id, artifactType, fullText]
+          );
+        } catch (err) {
+          console.error('Failed to save code artifact to DB:', err.message);
+        }
+        res.write(`data: ${JSON.stringify({ type: 'done', stage, artifactType })}\n\n`);
+        res.write('data: [DONE]\n\n');
+        res.end();
+      },
+      // onError
+      (errMsg) => {
+        res.write(`data: ${JSON.stringify({ type: 'error', message: errMsg })}\n\n`);
+        res.write('data: [DONE]\n\n');
+        res.end();
+      }
+    );
+  } catch (err) {
+    if (!res.headersSent) return res.status(500).json({ error: err.message });
+    res.write(`data: ${JSON.stringify({ type: 'error', message: err.message })}\n\n`);
+    res.write('data: [DONE]\n\n');
+    res.end();
+  }
 });
 
 module.exports = router;

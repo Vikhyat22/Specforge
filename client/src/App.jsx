@@ -4,6 +4,7 @@ import AuthPage from './pages/AuthPage'
 import Dashboard from './pages/Dashboard'
 import NewProject from './pages/NewProject'
 import SpecGen from './pages/SpecGen'
+import CodeGen from './pages/CodeGen'
 
 function Landing() {
   return <div>Landing</div>
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/projects/new" element={<NewProject />} />
           <Route path="/projects/:id" element={<SpecGen />} />
+          <Route path="/projects/:id/code" element={<CodeGen />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

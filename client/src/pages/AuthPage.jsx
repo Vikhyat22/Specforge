@@ -1,10 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '@/context/AuthContext'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { useAuth } from '../context/AuthContext'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001'
 
@@ -19,29 +15,37 @@ export default function AuthPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
 
-  async function handleSubmit(e) {
-    e.preventDefault()
+  async function handleSubmit() {
     setError('')
     setLoading(true)
 
-    const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register'
-    const body = isLogin ? { email, password } : { name, email, password }
-
     try {
-      const res = await fetch(`${BASE_URL}${endpoint}`, {
+      // Register then auto-login, or just login
+      if (!isLogin) {
+        const regRes = await fetch(`${BASE_URL}/api/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password }),
+        })
+        const regData = await regRes.json()
+        if (!regRes.ok) {
+          setError(regData.message || regData.error || 'Registration failed')
+          return
+        }
+      }
+
+      const loginRes = await fetch(`${BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ email, password }),
       })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        setError(data.message || data.error || 'Something went wrong')
+      const loginData = await loginRes.json()
+      if (!loginRes.ok) {
+        setError(loginData.message || loginData.error || 'Login failed')
         return
       }
 
-      login(data.token, data.user)
+      login(loginData.token, loginData.user)
       navigate('/dashboard')
     } catch {
       setError('Network error — please try again')
@@ -50,142 +54,129 @@ export default function AuthPage() {
     }
   }
 
+  function switchMode(toLogin) {
+    setIsLogin(toLogin)
+    setError('')
+  }
+
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'var(--ink)',
-      }}
-    >
-      <Card
-        style={{
-          width: '100%',
-          maxWidth: '400px',
-          backgroundColor: 'var(--ink2)',
-          border: '1px solid hsl(var(--border))',
-        }}
-      >
-        <CardHeader style={{ paddingBottom: '8px' }}>
-          <div
-            style={{
-              fontSize: '1.5rem',
-              fontFamily: 'Syne, sans-serif',
-              fontWeight: 700,
-              color: 'var(--lime)',
-              marginBottom: '4px',
-            }}
-          >
-            SpecForge
+    <>
+      <div className="bg-grid" />
+      <div className="orb orb-a" />
+      <div className="orb orb-b" />
+      <div className="shell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+        <div style={{ width: '100%', maxWidth: 460 }}>
+
+          {/* Brand */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 40, justifyContent: 'center' }}>
+            <div className="brand-mark">SF</div>
+            <div className="brand-name">Spec<span>Forge</span></div>
           </div>
-          <CardTitle style={{ color: 'hsl(var(--foreground))', fontSize: '1.1rem' }}>
-            {isLogin ? 'Welcome back' : 'Create an account'}
-          </CardTitle>
-        </CardHeader>
 
-        <CardContent>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {!isLogin && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <Label htmlFor="name" style={{ color: 'hsl(var(--foreground))' }}>
-                  Name
-                </Label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Your name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
+          {/* Card */}
+          <div className="fcard">
+            <div className="fcard-head">
+              <span style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: 'var(--lime)' }}>
+                // {isLogin ? 'Welcome back' : 'Create account'}
+              </span>
+            </div>
+
+            <div style={{ padding: '28px 28px 32px' }}>
+
+              {/* Toggle tabs */}
+              <div style={{ display: 'flex', background: 'var(--ink)', borderRadius: 8, padding: 4, marginBottom: 28 }}>
+                <button
+                  onClick={() => switchMode(true)}
+                  type="button"
                   style={{
-                    backgroundColor: 'hsl(var(--input))',
-                    color: 'hsl(var(--foreground))',
-                    border: '1px solid hsl(var(--border))',
+                    flex: 1, padding: '8px', borderRadius: 6, border: 'none', cursor: 'pointer',
+                    background: isLogin ? 'var(--ink3)' : 'transparent',
+                    color: isLogin ? 'var(--text)' : 'var(--fog)',
+                    fontSize: 11, letterSpacing: 2, textTransform: 'uppercase',
+                    fontFamily: 'Syne, sans-serif', fontWeight: isLogin ? 600 : 400,
+                    transition: 'all .15s',
                   }}
-                />
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => switchMode(false)}
+                  type="button"
+                  style={{
+                    flex: 1, padding: '8px', borderRadius: 6, border: 'none', cursor: 'pointer',
+                    background: !isLogin ? 'var(--ink3)' : 'transparent',
+                    color: !isLogin ? 'var(--text)' : 'var(--fog)',
+                    fontSize: 11, letterSpacing: 2, textTransform: 'uppercase',
+                    fontFamily: 'Syne, sans-serif', fontWeight: !isLogin ? 600 : 400,
+                    transition: 'all .15s',
+                  }}
+                >
+                  Register
+                </button>
               </div>
-            )}
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <Label htmlFor="email" style={{ color: 'hsl(var(--foreground))' }}>
-                Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                style={{
-                  backgroundColor: 'hsl(var(--input))',
-                  color: 'hsl(var(--foreground))',
-                  border: '1px solid hsl(var(--border))',
-                }}
-              />
+              {/* Error */}
+              {error && (
+                <div className="err-bar show" style={{ marginBottom: 20 }}>
+                  {error}
+                </div>
+              )}
+
+              {/* Form fields */}
+              <div className="fgrid" style={{ gridTemplateColumns: '1fr', gap: 16 }}>
+                {!isLogin && (
+                  <div className="field">
+                    <label className="flabel">Full Name</label>
+                    <input
+                      type="text"
+                      placeholder="John Doe"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
+                )}
+                <div className="field">
+                  <label className="flabel">Email</label>
+                  <input
+                    type="email"
+                    placeholder="you@company.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+                <div className="field">
+                  <label className="flabel">Password</label>
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+                  />
+                </div>
+              </div>
+
+              {/* Submit */}
+              <button
+                className="proceed-btn"
+                onClick={handleSubmit}
+                disabled={loading}
+                type="button"
+                style={{ marginTop: 24, width: '100%' }}
+              >
+                {loading ? 'Please wait...' : isLogin ? 'Sign In →' : 'Create Account →'}
+              </button>
+
             </div>
+          </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <Label htmlFor="password" style={{ color: 'hsl(var(--foreground))' }}>
-                Password
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                style={{
-                  backgroundColor: 'hsl(var(--input))',
-                  color: 'hsl(var(--foreground))',
-                  border: '1px solid hsl(var(--border))',
-                }}
-              />
-            </div>
-
-            {error && (
-              <p style={{ color: 'var(--coral)', fontSize: '0.875rem', margin: 0 }}>
-                {error}
-              </p>
-            )}
-
-            <Button
-              type="submit"
-              disabled={loading}
-              style={{
-                width: '100%',
-                backgroundColor: 'var(--lime)',
-                color: 'var(--ink)',
-                fontWeight: 600,
-              }}
-            >
-              {loading ? 'Loading...' : isLogin ? 'Sign in' : 'Create account'}
-            </Button>
-          </form>
-
-          <p style={{ textAlign: 'center', marginTop: '16px', fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))' }}>
-            {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
-            <button
-              type="button"
-              onClick={() => { setIsLogin(!isLogin); setError('') }}
-              style={{
-                background: 'none',
-                border: 'none',
-                padding: 0,
-                color: 'var(--lime)',
-                cursor: 'pointer',
-                fontSize: 'inherit',
-                fontWeight: 500,
-              }}
-            >
-              {isLogin ? 'Register' : 'Sign in'}
-            </button>
+          {/* Footer */}
+          <p style={{ textAlign: 'center', marginTop: 24, fontSize: 11, color: 'var(--fog)', letterSpacing: 1 }}>
+            Spec-first AI code generation
           </p>
-        </CardContent>
-      </Card>
-    </div>
+
+        </div>
+      </div>
+    </>
   )
 }
