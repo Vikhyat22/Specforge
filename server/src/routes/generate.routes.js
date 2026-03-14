@@ -328,7 +328,10 @@ DEMO DATA rules:
 - All string values maximum 20 characters
 - No nested objects inside records
 - Define STORE before any functions
-- End every record with a comma except the last one`;
+- End every record with a comma except the last one
+20. For sidebar navigation, use text labels only — NO icon fonts, NO emoji, NO unicode symbols. Use plain text like "Dashboard", "Accounts", "Transactions" as nav links
+21. Sidebar must have fixed width of 200px with font-size 14px, and nav links must be plain <a href="#/route"> text elements with padding 10px 16px
+22. All font sizes must be explicitly set in CSS — body font-size: 14px, h1: 24px, h2: 20px, h3: 16px — never leave font size to browser defaults`;
 
     const artifactSummary = Object.entries(artifacts)
       .map(([type, content]) => `--- ${type.toUpperCase()} ---\n${content.slice(0, 1000)}`)
