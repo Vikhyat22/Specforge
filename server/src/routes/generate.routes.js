@@ -345,11 +345,14 @@ Generate the complete single-file HTML preview now.`;
       // onDone
       async () => {
         try {
+          // strip any text before <!DOCTYPE html>
+          const doctypeIdx = fullText.indexOf('<!DOCTYPE html>')
+          const cleanHtml = doctypeIdx >= 0 ? fullText.slice(doctypeIdx) : fullText
           await query(
             `INSERT INTO code_artifacts (project_id, artifact_type, content)
              VALUES ($1, $2, $3)
              ON CONFLICT (project_id, artifact_type) DO UPDATE SET content = $3`,
-            [project_id, 'preview', fullText]
+            [project_id, 'preview', cleanHtml]
           );
         } catch (err) {
           console.error('Failed to save preview artifact to DB:', err.message);
