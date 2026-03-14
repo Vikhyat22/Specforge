@@ -315,7 +315,9 @@ CRITICAL RULES — follow every single one:
 10. Apply ${industry || 'fintech'}-appropriate color scheme
 11. No broken buttons — every button must do something
 12. Use document.getElementById('app').innerHTML = html pattern for rendering
-13. The very last line of your script must be: render(window.location.hash || '#/dashboard');`;
+13. The very last line of your script must be: render(window.location.hash || '#/dashboard');
+14. Every function called from onclick= attributes must be defined as window.functionName = function() {} — never as const or let or inside another function
+15. The #app div must exist in the HTML body BEFORE any script runs: <body><div id="app"></div><script>...</script></body>`;
 
     const artifactSummary = Object.entries(artifacts)
       .map(([type, content]) => `--- ${type.toUpperCase()} ---\n${content.slice(0, 1000)}`)
