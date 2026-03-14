@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001'
 
@@ -14,6 +15,7 @@ export default function PreviewPage() {
   const { id: projectId } = useParams()
   const { token } = useAuth()
   const navigate = useNavigate()
+  const { showToast } = useToast()
 
   const [htmlContent, setHtmlContent] = useState('')
   const [viewport, setViewport] = useState('100%')
@@ -102,8 +104,8 @@ export default function PreviewPage() {
   function copyShareLink() {
     const url = `${BASE_URL}/preview/${projectId}`
     navigator.clipboard.writeText(url)
-      .then(() => alert('Share link copied to clipboard!'))
-      .catch(() => alert(`Share link: ${url}`))
+      .then(() => showToast('Share link copied to clipboard!', 'success'))
+      .catch(() => showToast(`Share link: ${url}`, 'info'))
   }
 
   function downloadHTML() {

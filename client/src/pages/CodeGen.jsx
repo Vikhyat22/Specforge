@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001'
 
@@ -18,6 +19,7 @@ export default function CodeGen() {
   const { id: projectId } = useParams()
   const { token } = useAuth()
   const navigate = useNavigate()
+  const { showToast } = useToast()
 
   const [stages, setStages] = useState(
     STAGES.map(s => ({ ...s, status: 'pending', content: '' }))
@@ -229,7 +231,7 @@ export default function CodeGen() {
             <div className="err-bar show" style={{ marginBottom: 24 }}>{error}</div>
           )}
 
-          <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 24, alignItems: 'start' }}>
+          <div className="codegen-layout" style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 24, alignItems: 'start' }}>
 
             {/* ── LEFT: Pipeline status panel ── */}
             <div className="fcard">

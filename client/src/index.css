@@ -193,3 +193,64 @@ button { cursor: pointer; font-family: 'JetBrains Mono', monospace; }
   .spec-layout   { grid-template-columns: 1fr; }
   .fgrid { grid-template-columns: 1fr; }
 }
+
+/* ===== MOBILE RESPONSIVENESS ===== */
+@media (max-width: 768px) {
+  /* Dashboard — cards stack single column */
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
+  /* NewProject — full width fields, reduced padding */
+  .intake-layout {
+    grid-template-columns: 1fr !important;
+    padding: 16px !important;
+  }
+  .intake-sidebar {
+    display: none !important;
+  }
+  .fgrid {
+    grid-template-columns: 1fr !important;
+  }
+  .chip-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  /* SpecGen — panels stack vertically */
+  .spec-layout {
+    grid-template-columns: 1fr !important;
+  }
+  /* CodeGen — pipeline above code viewer */
+  .codegen-layout {
+    grid-template-columns: 1fr !important;
+  }
+  /* General shell padding */
+  .shell {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  .page-inner {
+    padding: 16px !important;
+  }
+  /* Hero text scale down */
+  .hero-h {
+    font-size: 28px !important;
+  }
+  .hero-sub {
+    font-size: 14px !important;
+  }
+  /* Topnav — hide brand name on very small screens */
+  .brand-name {
+    display: none !important;
+  }
+  /* Buttons full width on mobile where appropriate */
+  .proceed-btn {
+    width: 100% !important;
+  }
+}
+@media (max-width: 480px) {
+  .chip-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .hero-h {
+    font-size: 22px !important;
+  }
+}

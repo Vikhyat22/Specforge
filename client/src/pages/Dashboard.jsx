@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001'
 
@@ -42,6 +43,7 @@ function formatDate(iso) {
 export default function Dashboard() {
   const { user, token, logout } = useAuth()
   const navigate = useNavigate()
+  const { showToast } = useToast()
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -128,7 +130,7 @@ export default function Dashboard() {
 
           {/* ── Projects grid ── */}
           {!loading && projects.length > 0 && (
-            <div style={{
+            <div className="dashboard-grid" style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
               gap: 16,

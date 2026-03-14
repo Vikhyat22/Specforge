@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001'
 
@@ -14,6 +15,7 @@ export default function AuthPage() {
 
   const { login } = useAuth()
   const navigate = useNavigate()
+  const { showToast } = useToast()
 
   async function handleSubmit() {
     setError('')
@@ -49,6 +51,7 @@ export default function AuthPage() {
       navigate('/dashboard')
     } catch {
       setError('Network error — please try again')
+      showToast('Network error — please try again', 'error')
     } finally {
       setLoading(false)
     }
