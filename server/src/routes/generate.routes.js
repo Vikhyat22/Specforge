@@ -302,17 +302,20 @@ router.post('/preview', authenticate, async (req, res) => {
     artifactsRes.rows.forEach(r => { artifacts[r.artifact_type] = r.content; });
 
     const systemPrompt = `You are a senior frontend engineer. Output a SINGLE complete HTML file. All CSS and JS must be inline. One Google Fonts link is allowed.
-Rules you must follow exactly:
-- Output must start with exactly: <!DOCTYPE html>
-- All data operations must use an in-memory MockAPI. Create a global const STORE = {} at the top of the JS.
-- Pre-seed STORE with 8-10 realistic, domain-specific records based on the industry and project type. No placeholder names like John Doe or example.com.
-- Show demo credentials on the login screen: demo@${industry || 'app'}.app / demo123
-- Use hash-based routing (#/) for all routes defined in the SRS Section 4. Every internal link must use # prefix.
-- Every FR item from SRS Section 3 must have a visible UI element.
-- CRUD operations: create must add to STORE and refresh the list; update must edit in STORE; delete must remove from STORE with a confirm dialog.
-- Apply an industry-appropriate color palette and use domain terminology throughout.
-- No broken buttons. Every interactive element must do something.
-- No explanations. No markdown fences. Output raw HTML only.`;
+CRITICAL RULES — follow every single one:
+1. Your response must begin with exactly <!DOCTYPE html> — no text before it, no code fences, no markdown
+2. All data must use an in-memory MockAPI: const STORE = { users: [...], accounts: [...], transactions: [...] } pre-seeded with 8 realistic domain-specific records
+3. Show a login screen first with demo credentials: demo@${industry || 'app'}.app / demo123
+4. After login, render a dashboard with sidebar navigation
+5. Use hash routing: window.addEventListener('hashchange', render) — call render() immediately on page load with: render(window.location.hash || '#/dashboard')
+6. The render function must use a switch statement on the current hash and call renderDashboard(), renderList(), renderForm() etc
+7. Every nav link must use href="#/route" format
+8. CRUD: create adds to STORE and re-renders, edit updates STORE, delete removes with confirm() and re-renders
+9. Pre-seed demo data with realistic ${industry || 'fintech'} terminology — no John Doe, no example.com
+10. Apply ${industry || 'fintech'}-appropriate color scheme
+11. No broken buttons — every button must do something
+12. Use document.getElementById('app').innerHTML = html pattern for rendering
+13. The very last line of your script must be: render(window.location.hash || '#/dashboard');`;
 
     const artifactSummary = Object.entries(artifacts)
       .map(([type, content]) => `--- ${type.toUpperCase()} ---\n${content.slice(0, 1000)}`)
