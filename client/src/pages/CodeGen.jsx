@@ -25,6 +25,7 @@ export default function CodeGen() {
   const [activeTab, setActiveTab] = useState(1)
   const [running, setRunning] = useState(false)
   const [error, setError] = useState('')
+  const [zipLoading, setZipLoading] = useState(false)
   const abortRef = useRef(null)
 
   function updateStage(id, patch) {
@@ -122,6 +123,30 @@ export default function CodeGen() {
       await runStage(stageId)
     } catch (err) {
       setError(err.message)
+    }
+  }
+
+  async function downloadZip() {
+    setZipLoading(true)
+    try {
+      const res = await fetch(`${BASE_URL}/api/generate/zip/${projectId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Download failed')
+      }
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${projectId}.zip`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setZipLoading(false)
     }
   }
 
@@ -281,34 +306,32 @@ export default function CodeGen() {
                 </button>
 
                 {allDone && (
-                  <button
-                    onClick={() => console.log('Download All — Sprint 7')}
-                    type="button"
-                    style={{
-                      marginTop: 10, width: '100%', padding: '10px',
-                      background: 'var(--lime-dim)', border: '1px solid var(--lime)',
-                      color: 'var(--lime)', borderRadius: 8, cursor: 'pointer',
-                      fontSize: 11, letterSpacing: 2, textTransform: 'uppercase',
-                      fontFamily: 'Syne, sans-serif', fontWeight: 600,
-                    }}
-                  >
-                    ↓ Download All
-                  </button>
-                )}
-                {allDone && (
-                  <button
-                    onClick={() => navigate(`/projects/${projectId}/preview`)}
-                    type="button"
-                    style={{
-                      marginTop: 10, width: '100%', padding: '10px',
-                      background: 'var(--lime-dim)', border: '1px solid var(--lime)',
-                      color: 'var(--lime)', borderRadius: 8, cursor: 'pointer',
-                      fontSize: 11, letterSpacing: 2, textTransform: 'uppercase',
-                      fontFamily: 'Syne, sans-serif', fontWeight: 600,
-                    }}
-                  >
-                    ⚡ Generate Preview
-                  </button>
+                  <div style={{ marginTop:16, display:'flex', flexDirection:'column', gap:8 }}>
+                    <button
+                      onClick={downloadZip}
+                      disabled={zipLoading}
+                      style={{ width:'100%', padding:'10px',
+                        background:'var(--lime-dim)', border:'1px solid var(--lime)',
+                        color:'var(--lime)', borderRadius:8, cursor:'pointer',
+                        fontSize:11, letterSpacing:2, textTransform:'uppercase',
+                        fontFamily:'Syne, sans-serif', fontWeight:600 }}>
+                      {zipLoading ? 'Preparing...' : '↓ Download ZIP'}
+                    </button>
+                    <button
+                      onClick={() => navigate(`/projects/${projectId}/preview`)}
+                      style={{ width:'100%', padding:'10px',
+                        background:'none', border:'1px solid var(--violet)',
+                        color:'var(--violet)', borderRadius:8, cursor:'pointer',
+                        fontSize:11, letterSpacing:2, textTransform:'uppercase',
+                        fontFamily:'Syne, sans-serif', fontWeight:600 }}>
+                      ⚡ Generate Preview
+                    </button>
+                    <p style={{ fontSize:10, color:'var(--fog)', textAlign:'center',
+                      lineHeight:1.5, marginTop:4 }}>
+                      Download the ZIP, then push to GitHub manually:<br/>
+                      git init → git add . → git commit → git push
+                    </p>
+                  </div>
                 )}
               </div>
             </div>

@@ -3,6 +3,7 @@ const { query } = require('../config/db');
 const authenticate = require('../middleware/auth');
 const { streamCompletion } = require('../services/ai.service');
 const { buildCodePrompt } = require('../services/prompts.service');
+const { buildProjectZip } = require('../services/zip.service');
 
 const router = Router();
 
@@ -371,5 +372,35 @@ Generate the complete single-file HTML preview now.`;
     res.end();
   }
 });
+
+router.get('/zip/:project_id', authenticate, async (req, res) => {
+  const { project_id } = req.params
+  try {
+    const projRes = await query(
+      'SELECT name FROM projects WHERE id = $1 AND user_id = $2',
+      [project_id, req.user.userId]
+    )
+    if (!projRes.rows.length) return res.status(404).json({ error: 'Project not found' })
+    const { name } = projRes.rows[0]
+    const artifactsRes = await query(
+      'SELECT artifact_type, content FROM code_artifacts WHERE project_id = $1',
+      [project_id]
+    )
+    const artifacts = {}
+    artifactsRes.rows.forEach(r => { artifacts[r.artifact_type] = r.content })
+    const required = ['database', 'backend', 'frontend-structure', 'frontend-components', 'package']
+    const missing = required.filter(s => !artifacts[s])
+    if (missing.length) {
+      return res.status(400).json({ error: 'Generate all 5 code stages first', missing })
+    }
+    const zipBuffer = await buildProjectZip(name, artifacts)
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+    res.setHeader('Content-Type', 'application/zip')
+    res.setHeader('Content-Disposition', `attachment; filename="${slug}.zip"`)
+    res.send(zipBuffer)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
 
 module.exports = router;
