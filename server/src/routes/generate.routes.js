@@ -317,7 +317,10 @@ CRITICAL RULES — follow every single one:
 12. Use document.getElementById('app').innerHTML = html pattern for rendering
 13. The very last line of your script must be: render(window.location.hash || '#/dashboard');
 14. Every function called from onclick= attributes must be defined as window.functionName = function() {} — never as const or let or inside another function
-15. The #app div must exist in the HTML body BEFORE any script runs: <body><div id="app"></div><script>...</script></body>`;
+15. The #app div must exist in the HTML body BEFORE any script runs: <body><div id="app"></div><script>...</script></body>
+16. NEVER use document.getElementById('app').innerHTML += to append modals. Instead put the modal HTML directly inside each page's HTML string as a hidden div, shown/hidden via display style
+17. Hash routing: window.location.hash values will be '#/dashboard', '#/login' etc WITH the slash — always include the slash in case statements: case '#/dashboard': not case 'dashboard':
+18. Do NOT run any code between defining functions and calling render() at the bottom — define all functions first, then call render() as the very last line`;
 
     const artifactSummary = Object.entries(artifacts)
       .map(([type, content]) => `--- ${type.toUpperCase()} ---\n${content.slice(0, 1000)}`)
