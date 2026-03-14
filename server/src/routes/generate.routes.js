@@ -320,7 +320,15 @@ CRITICAL RULES — follow every single one:
 15. The #app div must exist in the HTML body BEFORE any script runs: <body><div id="app"></div><script>...</script></body>
 16. NEVER use document.getElementById('app').innerHTML += to append modals. Instead put the modal HTML directly inside each page's HTML string as a hidden div, shown/hidden via display style
 17. Hash routing: window.location.hash values will be '#/dashboard', '#/login' etc WITH the slash — always include the slash in case statements: case '#/dashboard': not case 'dashboard':
-18. Do NOT run any code between defining functions and calling render() at the bottom — define all functions first, then call render() as the very last line`;
+18. Do NOT run any code between defining functions and calling render() at the bottom — define all functions first, then call render() as the very last line
+19. Before closing </script>, always output this exact line as a safety check: if(!document.getElementById('app')) document.body.innerHTML = '<div id=app></div>' + document.body.innerHTML;
+DEMO DATA rules:
+- Maximum 5 records per entity
+- Each record maximum 6 fields
+- All string values maximum 20 characters
+- No nested objects inside records
+- Define STORE before any functions
+- End every record with a comma except the last one`;
 
     const artifactSummary = Object.entries(artifacts)
       .map(([type, content]) => `--- ${type.toUpperCase()} ---\n${content.slice(0, 1000)}`)
