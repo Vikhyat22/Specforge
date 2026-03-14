@@ -1,6 +1,7 @@
 const anthropic   = require('./providers/anthropic');
 const gemini      = require('./providers/gemini');
 const openrouter  = require('./providers/openrouter');
+const opencode    = require('./providers/opencode');
 
 /**
  * Returns the name of the currently configured AI provider.
@@ -28,6 +29,10 @@ function streamCompletion(systemPrompt, userPrompt, onChunk, onDone, onError) {
 
   if (provider === 'gemini') {
     return gemini.streamCompletion(systemPrompt, userPrompt, onChunk, onDone, onError);
+  }
+
+  if (provider === 'opencode') {
+    return opencode.streamCompletion(systemPrompt, userPrompt, onChunk, onDone, onError);
   }
 
   // default: openrouter
