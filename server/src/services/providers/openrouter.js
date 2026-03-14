@@ -13,7 +13,7 @@ async function streamCompletion(systemPrompt, userPrompt, onChunk, onDone, onErr
         'X-Title': 'SpecForge',
       },
       body: JSON.stringify({
-        model: 'qwen/qwen3-coder-480b-a35b-instruct:free',
+        model: 'qwen/qwen3-coder:free',
         max_tokens: 16000,
         stream: true,
         messages: [
