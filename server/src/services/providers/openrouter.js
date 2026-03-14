@@ -9,12 +9,12 @@ async function streamCompletion(systemPrompt, userPrompt, onChunk, onDone, onErr
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + process.env.OPENROUTER_API_KEY,
-        'HTTP-Referer': 'http://localhost:5173',
+        'HTTP-Referer': process.env.FRONTEND_URL || 'http://localhost:5173',
         'X-Title': 'SpecForge',
       },
       body: JSON.stringify({
-        model: 'openrouter/free',
-        max_tokens: 8000,
+        model: 'qwen/qwen3-coder-480b-a35b-instruct:free',
+        max_tokens: 16000,
         stream: true,
         messages: [
           { role: 'system', content: systemPrompt },
