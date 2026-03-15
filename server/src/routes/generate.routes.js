@@ -301,42 +301,32 @@ router.post('/preview', authenticate, async (req, res) => {
     const artifacts = {};
     artifactsRes.rows.forEach(r => { artifacts[r.artifact_type] = r.content; });
 
-    const systemPrompt = `Output a SINGLE HTML file. All CSS and JS must be inline. One Google Fonts link is allowed.
-- All data operations must use an in-memory MockAPI. Create a global var STORE = {} at the top of the JS.
-- Pre-seed STORE with 5 realistic domain-specific records for the primary entity. No placeholder names like John Doe.
-- Show a login screen first with demo credentials: demo@${industry || 'app'}.app / demo123
-- After login show a dashboard with sidebar navigation and a data table
-- Use hash-based routing. Implement as: function render(hash) { ... } then window.onhashchange = function() { render(location.hash); }
-- Call render(location.hash || '#/dashboard') as the very last line of the script
-- Every nav link must use href="#/routename" format
-- CRUD: create adds to STORE and calls render, delete removes from STORE with confirm() and calls render
-- Apply a ${industry || 'professional'}-appropriate color palette
-- Every button must do something
-- Output must start with exactly: <!DOCTYPE html>
-- HTML structure must be: <body><div id="app"></div><script>all JS here</script></body>
-- All onclick handler functions must be assigned to window: window.fnName = function() {}
-- Use var instead of const/let. Use regular functions instead of arrow functions.
-- Every open bracket { must be closed }. Every open paren ( must be closed ). Complete the entire file.`;
-
-    // Extract key sections from SRS intelligently
-    const srsLines = srs_content || ''
-    const section3Idx = srsLines.toLowerCase().indexOf('3. functional')
-    const section6Idx = srsLines.toLowerCase().indexOf('6. database')
-    const section7Idx = srsLines.toLowerCase().indexOf('7.')
-    const functionalReqs = section3Idx >= 0
-      ? srsLines.slice(section3Idx, section6Idx > 0 ? section6Idx : section3Idx + 2000).slice(0, 2000)
-      : srsLines.slice(0, 2000)
-    const dbSchema = section6Idx >= 0
-      ? srsLines.slice(section6Idx, section7Idx > 0 ? section7Idx : section6Idx + 1500).slice(0, 1500)
-      : ''
-    const userPrompt = `Project: ${name}
+    const systemPrompt = `You are generating a single-file HTML interactive demo app.
+MOST IMPORTANT: The JavaScript is the core of this app. You MUST generate the complete <script> block. Without JS the app is useless.
+File structure — follow in this exact order:
+1. <!DOCTYPE html><html><head> — minimal head, one Google Font link
+2. <style> — max 20 lines of CSS only
+3. </head><body><div id="app"></div>
+4. <script> — THIS IS THE MAIN PART. All app logic here.
+5. </script></body></html>
+JS requirements inside <script>:
+- var STORE = { user: null, records: [3 simple objects with id/name/status/amount fields] }
+- function render(hash) with if/else for each route
+- window.doLogin = function() to set STORE.user and call render
+- window.doLogout = function() to clear STORE.user and call render
+- window.addRecord = function() to push to STORE.records and call render
+- window.deleteRecord = function(id) with confirm() to splice from STORE.records and call render
+- window.onhashchange = function() { render(location.hash) }
+- Last line: render(location.hash || '#/dashboard')
+Pages to render:
+- Login page: form with email/password, show demo credentials demo@${industry || 'app'}.app / demo123
+- Dashboard: welcome message + stats + table of STORE.records with Delete buttons
+- Add page: simple form to add a new record
+App title: ${name}
 Industry: ${industry || 'general'}
-Type: ${project_type || 'web app'}
-FUNCTIONAL REQUIREMENTS (Section 3 of SRS):
-${functionalReqs}
-DATABASE SCHEMA (Section 6 of SRS):
-${dbSchema}
-Generate a complete single-file HTML interactive preview that implements these requirements with MockAPI data.`;
+Domain context: ${srs_content ? srs_content.slice(0, 800) : ''}
+CRITICAL: Generate the complete file including all JS. Do not stop after CSS.`
+    const userPrompt = `Generate the complete single-file HTML app for ${name} now. Start with <!DOCTYPE html> and end with </html>. Include all JavaScript.`
 
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
