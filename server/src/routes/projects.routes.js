@@ -65,4 +65,25 @@ router.post('/:id/inputs', authenticate, async (req, res) => {
   }
 });
 
+router.get('/:id/artifacts', authenticate, async (req, res) => {
+  try {
+    const { id } = req.params
+    // verify ownership
+    const proj = await query(
+      'SELECT id FROM projects WHERE id = $1 AND user_id = $2',
+      [id, req.user.userId]
+    )
+    if (!proj.rows.length) return res.status(404).json({ error: 'Project not found' })
+    const result = await query(
+      'SELECT artifact_type, content FROM code_artifacts WHERE project_id = $1',
+      [id]
+    )
+    const artifacts = {}
+    result.rows.forEach(r => { artifacts[r.artifact_type] = r.content })
+    res.json(artifacts)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
 module.exports = router;
