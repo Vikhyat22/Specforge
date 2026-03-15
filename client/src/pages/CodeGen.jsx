@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
@@ -29,6 +29,12 @@ export default function CodeGen() {
   const [error, setError] = useState('')
   const [zipLoading, setZipLoading] = useState(false)
   const abortRef = useRef(null)
+  const codeViewerRef = useRef(null)
+  useEffect(() => {
+    if (codeViewerRef.current) {
+      codeViewerRef.current.scrollTop = codeViewerRef.current.scrollHeight
+    }
+  }, [stages])
 
   function updateStage(id, patch) {
     setStages(prev => prev.map(s => s.id === id ? { ...s, ...patch } : s))
@@ -365,7 +371,7 @@ export default function CodeGen() {
               {/* Content */}
               <div style={{ padding: 20 }}>
                 {activeStage?.content ? (
-                  <pre style={{
+                  <pre ref={codeViewerRef} style={{
                     margin: 0, padding: 16,
                     background: 'var(--ink)', borderRadius: 8,
                     overflowX: 'auto', overflowY: 'auto', maxHeight: 560,

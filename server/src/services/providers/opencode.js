@@ -9,7 +9,7 @@ async function streamCompletion(systemPrompt, userPrompt, onChunk, onDone, onErr
       },
       body: JSON.stringify({
         model: 'minimax-m2.5',
-        max_tokens: 32000,
+        max_tokens: 16000,
         stream: true,
         system: systemPrompt,
         messages: [
@@ -42,7 +42,6 @@ async function streamCompletion(systemPrompt, userPrompt, onChunk, onDone, onErr
         }
         try {
           const parsed = JSON.parse(data)
-          // Anthropic SSE format
           if (parsed.type === 'content_block_delta') {
             const content = parsed.delta?.text
             if (content) onChunk(content)
