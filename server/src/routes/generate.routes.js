@@ -301,43 +301,42 @@ router.post('/preview', authenticate, async (req, res) => {
     const artifacts = {};
     artifactsRes.rows.forEach(r => { artifacts[r.artifact_type] = r.content; });
 
-    const systemPrompt = `You are a senior frontend engineer. Output a SINGLE complete HTML file. All CSS and JS must be inline. One Google Fonts link is allowed.
-CRITICAL RULES — follow every single one:
-1. Your response must begin with exactly <!DOCTYPE html> — no text before it, no code fences, no markdown
-2. All data must use an in-memory MockAPI: const STORE = { users: [...], accounts: [...], transactions: [...] } pre-seeded with 5 realistic domain-specific records per entity
-3. Show a login screen first with demo credentials: demo@${industry || 'app'}.app / demo123
-4. After login, render a dashboard with sidebar navigation
-5. Use hash routing: window.addEventListener('hashchange', function() { render(window.location.hash) }) — call render() immediately on page load
-6. The render function must use if/else statements on the current hash and call page functions like renderDashboard(), renderAccounts() etc
-7. Every nav link must use href="#/route" format
-8. CRUD: create adds to STORE and re-renders, edit updates STORE, delete removes with confirm() and re-renders
-9. Pre-seed demo data with realistic ${industry || 'fintech'} terminology — no John Doe, no example.com
-10. Apply ${industry || 'fintech'}-appropriate color scheme
-11. No broken buttons — every button must do something
-12. Use document.getElementById('app').innerHTML = html pattern for rendering
-13. The very last line of your script must be: render(window.location.hash || '#/dashboard');
-14. Every function called from onclick= attributes must be defined as window.functionName = function() {} — never as const or let
-15. The #app div must exist in the HTML body BEFORE any script runs: <body><div id="app"></div><script>...</script></body>
-16. Never use innerHTML += to append modals. Modals must be hidden divs inside each page HTML string, shown/hidden via display style
-17. Hash routing case values must include the slash: '#/dashboard' not 'dashboard'
-18. Define all functions first, then call render() as the very last line — no executable code between function definitions
-19. Before closing </script>, add: if(!document.getElementById('app')) { document.body.innerHTML = '<div id="app"></div>' + document.body.innerHTML; }
-20. Demo data: max 5 records per entity, max 6 fields each, all string values max 20 characters, no nested objects
-21. Sidebar navigation must use text links only — no emoji, no unicode icons, no icon fonts. Use plain text: Dashboard, Accounts, Transactions
-22. All font sizes must be explicitly set — body: 14px, h1: 24px, h2: 20px — never rely on browser defaults
-23. JAVASCRIPT SYNTAX: Every opening ( { [ must have its closing ) } ] completed on the same line or before moving to next statement. Never break a method chain across lines. Write entire .find() .filter() calls on one line.`;
+    const systemPrompt = `Output a SINGLE HTML file. All CSS and JS must be inline. One Google Fonts link is allowed.
+- All data operations must use an in-memory MockAPI. Create a global var STORE = {} at the top of the JS.
+- Pre-seed STORE with 5 realistic domain-specific records for the primary entity. No placeholder names like John Doe.
+- Show a login screen first with demo credentials: demo@${industry || 'app'}.app / demo123
+- After login show a dashboard with sidebar navigation and a data table
+- Use hash-based routing. Implement as: function render(hash) { ... } then window.onhashchange = function() { render(location.hash); }
+- Call render(location.hash || '#/dashboard') as the very last line of the script
+- Every nav link must use href="#/routename" format
+- CRUD: create adds to STORE and calls render, delete removes from STORE with confirm() and calls render
+- Apply a ${industry || 'professional'}-appropriate color palette
+- Every button must do something
+- Output must start with exactly: <!DOCTYPE html>
+- HTML structure must be: <body><div id="app"></div><script>all JS here</script></body>
+- All onclick handler functions must be assigned to window: window.fnName = function() {}
+- Use var instead of const/let. Use regular functions instead of arrow functions.
+- Every open bracket { must be closed }. Every open paren ( must be closed ). Complete the entire file.`;
 
-    const artifactSummary = Object.entries(artifacts)
-      .map(([type, content]) => `--- ${type.toUpperCase()} ---\n${content.slice(0, 1000)}`)
-      .join('\n\n');
-
+    // Extract key sections from SRS intelligently
+    const srsLines = srs_content || ''
+    const section3Idx = srsLines.toLowerCase().indexOf('3. functional')
+    const section6Idx = srsLines.toLowerCase().indexOf('6. database')
+    const section7Idx = srsLines.toLowerCase().indexOf('7.')
+    const functionalReqs = section3Idx >= 0
+      ? srsLines.slice(section3Idx, section6Idx > 0 ? section6Idx : section3Idx + 2000).slice(0, 2000)
+      : srsLines.slice(0, 2000)
+    const dbSchema = section6Idx >= 0
+      ? srsLines.slice(section6Idx, section7Idx > 0 ? section7Idx : section6Idx + 1500).slice(0, 1500)
+      : ''
     const userPrompt = `Project: ${name}
 Industry: ${industry || 'general'}
 Type: ${project_type || 'web app'}
-SRS (first 4000 chars):
-${srs_content.slice(0, 4000)}
-${artifactSummary ? `Code artifacts (summaries):\n${artifactSummary}` : ''}
-Generate the complete single-file HTML preview now.`;
+FUNCTIONAL REQUIREMENTS (Section 3 of SRS):
+${functionalReqs}
+DATABASE SCHEMA (Section 6 of SRS):
+${dbSchema}
+Generate a complete single-file HTML interactive preview that implements these requirements with MockAPI data.`;
 
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
