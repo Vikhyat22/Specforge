@@ -301,44 +301,49 @@ router.post('/preview', authenticate, async (req, res) => {
     const artifacts = {};
     artifactsRes.rows.forEach(r => { artifacts[r.artifact_type] = r.content; });
 
-    const systemPrompt = `You are a senior frontend engineer. Output a SINGLE complete HTML file. All CSS and JS must be inline. One Google Fonts link is allowed.
-CRITICAL RULES — follow every single one:
-1. Your response must begin with exactly <!DOCTYPE html> — no text before it, no code fences, no markdown
-2. All data must use an in-memory MockAPI: const STORE = { users: [...], accounts: [...], transactions: [...] } pre-seeded with 8 realistic domain-specific records
-3. Show a login screen first with demo credentials: demo@${industry || 'app'}.app / demo123
-4. After login, render a dashboard with sidebar navigation
-5. Use hash routing: window.addEventListener('hashchange', render) — call render() immediately on page load with: render(window.location.hash || '#/dashboard')
-6. The render function must use a switch statement on the current hash and call renderDashboard(), renderList(), renderForm() etc
-7. Every nav link must use href="#/route" format
-8. CRUD: create adds to STORE and re-renders, edit updates STORE, delete removes with confirm() and re-renders
-9. Pre-seed demo data with realistic ${industry || 'fintech'} terminology — no John Doe, no example.com
-10. Apply ${industry || 'fintech'}-appropriate color scheme
-11. No broken buttons — every button must do something
-12. Use document.getElementById('app').innerHTML = html pattern for rendering
-13. The very last line of your script must be: render(window.location.hash || '#/dashboard');
-14. Every function called from onclick= attributes must be defined as window.functionName = function() {} — never as const or let or inside another function
-15. The #app div must exist in the HTML body BEFORE any script runs: <body><div id="app"></div><script>...</script></body>
-16. NEVER use document.getElementById('app').innerHTML += to append modals. Instead put the modal HTML directly inside each page's HTML string as a hidden div, shown/hidden via display style
-17. Hash routing: window.location.hash values will be '#/dashboard', '#/login' etc WITH the slash — always include the slash in case statements: case '#/dashboard': not case 'dashboard':
-18. Do NOT run any code between defining functions and calling render() at the bottom — define all functions first, then call render() as the very last line
-19. Before closing </script>, always output this exact line as a safety check: if(!document.getElementById('app')) document.body.innerHTML = '<div id=app></div>' + document.body.innerHTML;
-DEMO DATA rules:
-- Maximum 5 records per entity
-- Each record maximum 6 fields
-- All string values maximum 20 characters
-- No nested objects inside records
-- Define STORE before any functions
-- End every record with a comma except the last one
-20. For sidebar navigation, use text labels only — NO icon fonts, NO emoji, NO unicode symbols. Use plain text like "Dashboard", "Accounts", "Transactions" as nav links
-21. Sidebar must have fixed width of 200px with font-size 14px, and nav links must be plain <a href="#/route"> text elements with padding 10px 16px
-22. All font sizes must be explicitly set in CSS — body font-size: 14px, h1: 24px, h2: 20px, h3: 16px — never leave font size to browser defaults
-23. JAVASCRIPT SYNTAX RULES — follow all strictly:
-- Every opening ( { [ must have its closing ) } ] on the same line or explicitly closed before moving to next statement
-- Every function must end with }; on its own line
-- Every array/object literal must end with }; or ]; on its own line
-- After writing each function, mentally verify: does every ( have a )? does every { have a }?
-- Never break a method chain across lines — write the entire .find() .filter() .map() call on one line
-- Test your JS mentally before outputting: if you call window.X = function() { you must close it with };`;
+    const systemPrompt = `You are a senior frontend engineer. Generate a SINGLE self-contained HTML file for a ${industry || 'web'} application demo.
+OUTPUT FORMAT:
+- Start with exactly: <!DOCTYPE html>
+- No markdown, no code fences, no explanation
+- Structure: <html><head><style>CSS here</style></head><body><div id="app"></div><script>JS here</script></body></html>
+CSS RULES:
+- Max 30 lines of CSS
+- body: font-family sans-serif; font-size 14px; margin 0; background #0f172a; color #e2e8f0
+- sidebar: 180px wide, fixed left, full height, background #1e293b
+- main: margin-left 180px, padding 20px
+- Use only basic CSS — no animations, no gradients, no icons
+JS ARCHITECTURE — follow exactly:
+var STORE = {
+  user: null,
+  accounts: [3 records with id,name,balance fields only],
+  transactions: [3 records with id,desc,amount,date fields only]
+};
+function render(hash) {
+  var app = document.getElementById('app');
+  if (!app) return;
+  if (!STORE.user) { app.innerHTML = loginHTML(); return; }
+  if (hash === '#/accounts') { app.innerHTML = accountsHTML(); return; }
+  if (hash === '#/transactions') { app.innerHTML = transactionsHTML(); return; }
+  app.innerHTML = dashboardHTML();
+}
+function loginHTML() { return '<form>...login form with demo@${industry || 'app'}.app / demo123...</form>'; }
+function dashboardHTML() { return '<h1>Dashboard</h1><table>...accounts table...</table>'; }
+function accountsHTML() { return '<h1>Accounts</h1><table>...with Add/Edit/Delete buttons...</table>'; }
+function transactionsHTML() { return '<h1>Transactions</h1><table>...transactions table...</table>'; }
+window.doLogin = function() { STORE.user = {name:'Demo User'}; render('#/dashboard'); };
+window.doLogout = function() { STORE.user = null; render('#/login'); };
+window.addRecord = function() { /* add to STORE.accounts, call render */ };
+window.deleteRecord = function(id) { if(confirm('Delete?')) { STORE.accounts = STORE.accounts.filter(function(a){return a.id!==id;}); render(window.location.hash); } };
+window.onhashchange = function() { render(window.location.hash); };
+render(window.location.hash || '#/dashboard');
+IMPORTANT: Use var not const/let. Use function declarations not arrow functions. Close every { with }. Complete the entire file — do not stop early.
+ADDITIONAL RULES:
+- Demo data must use realistic ${industry || 'fintech'} terminology — no "John Doe", no "example.com", no generic names
+- STORE records must have no nested objects — all values are strings or numbers only
+- Sidebar navigation must use text links only — no emoji, no unicode icons, no icon fonts
+- All font sizes must be set explicitly in CSS — never rely on browser defaults
+- Modals must be defined as hidden divs inside each page's HTML string, shown via style.display — never use innerHTML += to append modals
+- Keep total output under 250 lines so the file is always complete`;
 
     const artifactSummary = Object.entries(artifacts)
       .map(([type, content]) => `--- ${type.toUpperCase()} ---\n${content.slice(0, 1000)}`)
