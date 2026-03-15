@@ -9,7 +9,7 @@ async function streamCompletion(systemPrompt, userPrompt, onChunk, onDone, onErr
       },
       body: JSON.stringify({
         model: 'minimax-m2.5',
-        max_tokens: 16000,
+        max_tokens: 32000,
         stream: true,
         system: systemPrompt,
         messages: [
