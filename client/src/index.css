@@ -309,6 +309,14 @@ button { cursor: pointer; font-family: 'JetBrains Mono', monospace; }
   .landing-login-btn {
     display: none !important;
   }
+  /* Hide tech stack badges from nav on mobile */
+  .tech-stack-nav-badges {
+    display: none !important;
+  }
+  /* Reduce hero gap before form */
+  .intake-hero {
+    padding-bottom: 16px !important;
+  }
 }
 @media (max-width: 480px) {
   .chip-grid {

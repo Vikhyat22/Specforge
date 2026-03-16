@@ -139,7 +139,7 @@ export default function NewProject() {
               <span className="step-label">Generate Code</span>
             </div>
           </div>
-          <div style={{display:'flex', gap:6}}>
+          <div className="tech-stack-nav-badges" style={{display:'flex', gap:6}}>
             <span style={{fontSize:9, letterSpacing:1.5, textTransform:'uppercase', padding:'4px 10px',
               borderRadius:4, border:'1px solid rgba(61,155,255,.3)', color:'var(--sky)'}}>React</span>
             <span style={{fontSize:9, letterSpacing:1.5, textTransform:'uppercase', padding:'4px 10px',
