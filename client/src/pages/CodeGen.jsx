@@ -308,6 +308,7 @@ export default function CodeGen() {
                   onClick={runPipeline}
                   disabled={running}
                   type="button"
+                  style={{ width:'100%' }}
                   style={{ marginTop: 20, width: '100%' }}
                 >
                   {running ? '▶ Running...' : allDone ? '↺ Re-run Pipeline' : '▶ Run Pipeline'}

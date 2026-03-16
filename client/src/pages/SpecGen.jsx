@@ -381,6 +381,7 @@ export default function SpecGen() {
                   onClick={handleGenerate}
                   disabled={isStreaming}
                   type="button"
+                  style={{ width:'100%', marginTop:'8px' }}
                   style={{ marginTop: 0 }}
                 >
                   {isStreaming ? (

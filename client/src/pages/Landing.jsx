@@ -18,15 +18,20 @@ export default function Landing() {
               className="landing-login-btn"
               onClick={() => navigate('/auth')}
               style={{ background:'none', border:'1px solid var(--line2)', color:'var(--fog)',
-                padding:'0 18px', borderRadius:6, cursor:'pointer', fontSize:11,
+                padding:'0 16px', borderRadius:6, cursor:'pointer', fontSize:10,
                 letterSpacing:2, textTransform:'uppercase', fontFamily:'Syne, sans-serif',
-                height:36, lineHeight:'36px' }}>
+                fontWeight:600, height:34, lineHeight:'34px', display:'inline-flex',
+                alignItems:'center' }}>
               Login
             </button>
             <button
               onClick={() => navigate('/auth')}
-              className="proceed-btn"
-              style={{ padding:'0 18px', height:36, lineHeight:'36px' }}>
+              className="nav-cta-btn"
+              style={{ background:'var(--lime)', border:'none', borderRadius:8,
+                color:'var(--ink)', padding:'0 16px', cursor:'pointer', fontSize:10,
+                letterSpacing:2, textTransform:'uppercase', fontFamily:'Syne, sans-serif',
+                fontWeight:800, height:34, lineHeight:'34px', display:'inline-flex',
+                alignItems:'center', whiteSpace:'nowrap' }}>
               Get Started →
             </button>
           </div>

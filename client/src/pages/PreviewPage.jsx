@@ -165,7 +165,7 @@ const [viewport, setViewport] = useState('100%')
                 className="proceed-btn"
                 onClick={loadAndEmbed}
                 disabled={loading}
-                style={{ padding:'6px 20px' }}>
+                style={{ padding:'6px 20px', width:'auto', marginTop:0 }}>
                 {loading ? 'Loading...' : embedded ? '↺ Reload Preview' : '▶ Load Preview'}
               </button>
             </div>

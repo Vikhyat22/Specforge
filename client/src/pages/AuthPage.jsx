@@ -165,6 +165,7 @@ export default function AuthPage() {
                 onClick={handleSubmit}
                 disabled={loading}
                 type="button"
+                style={{ width:'100%', marginTop:'24px' }}
                 style={{ marginTop: 24, width: '100%' }}
               >
                 {loading ? 'Please wait...' : isLogin ? 'Sign In →' : 'Create Account →'}

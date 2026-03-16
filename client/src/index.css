@@ -146,7 +146,7 @@ button { cursor: pointer; font-family: 'JetBrains Mono', monospace; }
 .chip.on { background: var(--lime); border-color: var(--lime); color: var(--ink); font-weight: 600; }
 /* proceed button */
 .proceed-btn {
-  width: 100%; padding: 16px; margin-top: 8px;
+  padding: 16px;
   background: var(--lime); border: none; border-radius: 10px;
   color: var(--ink); font-family: 'Syne', sans-serif;
   font-size: 14px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase;
@@ -155,6 +155,12 @@ button { cursor: pointer; font-family: 'JetBrains Mono', monospace; }
 }
 .proceed-btn:hover { background: #d4ff3d; transform: translateY(-2px); box-shadow: 0 12px 32px var(--lime-glow); }
 .proceed-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+.nav-cta-btn { transition: all .2s; }
+.nav-cta-btn:hover {
+  background: #d4ff3d !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 32px var(--lime-glow) !important;
+}
 /* page inner */
 .page-inner { max-width: 1140px; margin: 0 auto; padding: 40px 32px 80px; }
 /* hero block */
@@ -207,13 +213,9 @@ button { cursor: pointer; font-family: 'JetBrains Mono', monospace; }
     width: 100% !important;
   }
   .shell {
-    padding-left: 16px !important;
-    padding-right: 16px !important;
     overflow-x: hidden !important;
   }
-  .page-inner {
-    padding: 16px !important;
-  }
+  .page-inner { padding: 16px 16px !important; }
   /* Dashboard */
   .dashboard-grid {
     grid-template-columns: 1fr !important;
@@ -261,7 +263,7 @@ button { cursor: pointer; font-family: 'JetBrains Mono', monospace; }
   }
   /* Landing page hero */
   .hero-block {
-    padding: 60px 16px 40px !important;
+    padding: 48px 16px 40px !important;
   }
   /* Brand name hide on very small screens */
   .brand-name {
@@ -271,6 +273,13 @@ button { cursor: pointer; font-family: 'JetBrains Mono', monospace; }
   .proceed-btn {
     font-size: 11px !important;
     padding: 10px 16px !important;
+  }
+  /* Nav proceed-btn should not be overridden on mobile */
+  .topnav .proceed-btn {
+    padding: 0 14px !important;
+    height: 34px !important;
+    font-size: 10px !important;
+    margin-top: 0 !important;
   }
   /* fcard full width */
   .fcard {
@@ -285,11 +294,6 @@ button { cursor: pointer; font-family: 'JetBrains Mono', monospace; }
   /* Exception — don't restrict inline elements */
   span, a, button {
     max-width: unset !important;
-  }
-  /* Fix landing page spacing */
-  .hero-block {
-    padding-top: 48px !important;
-    padding-bottom: 40px !important;
   }
   /* Fix monospace subtext on mobile */
   .hero-sub {
@@ -314,19 +318,24 @@ button { cursor: pointer; font-family: 'JetBrains Mono', monospace; }
   .tech-stack-nav-badges {
     display: none !important;
   }
-  /* Reduce hero gap before form */
+  /* Reduce gap between dashboard header and cards */
+  .dashboard-grid {
+    margin-top: 16px !important;
+  }
+  /* Reduce gap between intake hero and form */
   .intake-hero {
-    padding-bottom: 16px !important;
+    padding-bottom: 8px !important;
+    margin-bottom: 0 !important;
   }
   /* Fix nav on mobile */
   .topnav {
     padding: 0 16px !important;
     height: 60px !important;
-    overflow-x: hidden !important;
-  }
-  .topnav > div {
+    min-height: 60px !important;
     display: flex !important;
     align-items: center !important;
+    justify-content: space-between !important;
+    overflow-x: hidden !important;
   }
 }
 @media (max-width: 480px) {

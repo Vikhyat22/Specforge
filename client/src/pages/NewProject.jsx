@@ -391,6 +391,7 @@ export default function NewProject() {
                 onClick={handleSubmit}
                 disabled={submitting}
                 type="button"
+                style={{ width:'100%', marginTop:'8px' }}
               >
                 {submitting ? 'Creating…' : 'Generate SRS + BRD →'}
               </button>
