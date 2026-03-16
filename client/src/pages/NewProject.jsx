@@ -122,21 +122,21 @@ export default function NewProject() {
               background:'var(--lime-dim)', fontSize:10, letterSpacing:1, textTransform:'uppercase'}}>
               <div style={{width:18, height:18, borderRadius:'50%', background:'var(--lime)',
                 color:'var(--ink)', display:'grid', placeItems:'center', fontSize:9, fontWeight:600}}>1</div>
-              Project Intake
+              <span className="step-label">Project Intake</span>
             </div>
             <span style={{color:'var(--line)', fontSize:12}}>›</span>
             <div style={{display:'flex', alignItems:'center', gap:8, padding:'6px 16px',
               borderRadius:6, color:'var(--fog)', fontSize:10, letterSpacing:1, textTransform:'uppercase'}}>
               <div style={{width:18, height:18, borderRadius:'50%', background:'var(--line)',
                 color:'var(--fog)', display:'grid', placeItems:'center', fontSize:9, fontWeight:600}}>2</div>
-              Generate Spec
+              <span className="step-label">Generate Spec</span>
             </div>
             <span style={{color:'var(--line)', fontSize:12}}>›</span>
             <div style={{display:'flex', alignItems:'center', gap:8, padding:'6px 16px',
               borderRadius:6, color:'var(--fog)', fontSize:10, letterSpacing:1, textTransform:'uppercase'}}>
               <div style={{width:18, height:18, borderRadius:'50%', background:'var(--line)',
                 color:'var(--fog)', display:'grid', placeItems:'center', fontSize:9, fontWeight:600}}>3</div>
-              Generate Code
+              <span className="step-label">Generate Code</span>
             </div>
           </div>
           <div style={{display:'flex', gap:6}}>

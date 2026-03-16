@@ -13,6 +13,7 @@ export default function Landing() {
           <div className="brand-name">Spec<span>Forge</span></div>
           <div style={{ marginLeft:'auto', display:'flex', gap:10, alignItems:'center' }}>
             <button
+              className="landing-login-btn"
               onClick={() => navigate('/auth')}
               style={{ background:'none', border:'1px solid var(--line2)', color:'var(--fog)',
                 padding:'6px 18px', borderRadius:6, cursor:'pointer', fontSize:11,

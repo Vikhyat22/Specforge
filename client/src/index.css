@@ -285,6 +285,30 @@ button { cursor: pointer; font-family: 'JetBrains Mono', monospace; }
   span, a, button {
     max-width: unset !important;
   }
+  /* Fix landing page spacing */
+  .hero-block {
+    padding-top: 48px !important;
+    padding-bottom: 40px !important;
+  }
+  /* Fix monospace subtext on mobile */
+  .hero-sub {
+    font-family: 'Syne', sans-serif !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+  }
+  /* Reduce section padding on mobile */
+  .page-inner > div {
+    padding-top: 40px !important;
+    padding-bottom: 40px !important;
+  }
+  /* Step indicator — hide text labels, show numbers only */
+  .step-label {
+    display: none !important;
+  }
+  /* Landing nav — hide Login button, keep only Get Started */
+  .landing-login-btn {
+    display: none !important;
+  }
 }
 @media (max-width: 480px) {
   .chip-grid {
