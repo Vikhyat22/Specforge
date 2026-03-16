@@ -8,7 +8,7 @@ export default function Landing() {
       <div className="orb orb-b" />
       <div className="shell">
         {/* Nav */}
-        <nav className="topnav" style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 24px', height:60 }}>
+        <nav className="topnav">
           <div style={{ display:'flex', alignItems:'center', gap:10 }}>
             <div className="brand-mark">SF</div>
             <div className="brand-name">Spec<span>Forge</span></div>
@@ -18,15 +18,15 @@ export default function Landing() {
               className="landing-login-btn"
               onClick={() => navigate('/auth')}
               style={{ background:'none', border:'1px solid var(--line2)', color:'var(--fog)',
-                padding:'6px 18px', borderRadius:6, cursor:'pointer', fontSize:11,
+                padding:'0 18px', borderRadius:6, cursor:'pointer', fontSize:11,
                 letterSpacing:2, textTransform:'uppercase', fontFamily:'Syne, sans-serif',
-                height:36, display:'flex', alignItems:'center' }}>
+                height:36, lineHeight:'36px' }}>
               Login
             </button>
             <button
               onClick={() => navigate('/auth')}
               className="proceed-btn"
-              style={{ padding:'6px 18px', height:36, display:'flex', alignItems:'center' }}>
+              style={{ padding:'0 18px', height:36, lineHeight:'36px' }}>
               Get Started →
             </button>
           </div>
