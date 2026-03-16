@@ -103,7 +103,7 @@ export default function Dashboard() {
         <div className="page-inner">
 
           {/* Hero eyebrow + action row */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 32 }}>
+          <div className="dashboard-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 32 }}>
             <div className="hero-eyebrow">// Your Projects</div>
             <button
               className="proceed-btn"

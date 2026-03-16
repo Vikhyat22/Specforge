@@ -196,14 +196,38 @@ button { cursor: pointer; font-family: 'JetBrains Mono', monospace; }
 
 /* ===== MOBILE RESPONSIVENESS ===== */
 @media (max-width: 768px) {
-  /* Dashboard — cards stack single column */
+  /* Prevent horizontal overflow globally */
+  html, body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+  }
+  .shell {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    overflow-x: hidden !important;
+  }
+  .page-inner {
+    padding: 16px !important;
+  }
+  /* Dashboard */
   .dashboard-grid {
     grid-template-columns: 1fr !important;
   }
-  /* NewProject — full width fields, reduced padding */
+  /* Dashboard header — stack eyebrow and button vertically */
+  .dashboard-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  .dashboard-header .proceed-btn {
+    width: 100% !important;
+  }
+  /* NewProject — fix overflow */
   .intake-layout {
     grid-template-columns: 1fr !important;
-    padding: 16px !important;
+    padding: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
   .intake-sidebar {
     display: none !important;
@@ -214,36 +238,52 @@ button { cursor: pointer; font-family: 'JetBrains Mono', monospace; }
   .chip-grid {
     grid-template-columns: repeat(2, 1fr) !important;
   }
-  /* SpecGen — panels stack vertically */
+  /* Step indicator nav — hide labels, show numbers only */
+  .topnav {
+    padding: 0 12px !important;
+    overflow-x: hidden !important;
+  }
+  /* SpecGen */
   .spec-layout {
     grid-template-columns: 1fr !important;
   }
-  /* CodeGen — pipeline above code viewer */
+  /* CodeGen */
   .codegen-layout {
     grid-template-columns: 1fr !important;
   }
-  /* General shell padding */
-  .shell {
-    padding-left: 16px !important;
-    padding-right: 16px !important;
-  }
-  .page-inner {
-    padding: 16px !important;
-  }
-  /* Hero text scale down */
+  /* Hero text */
   .hero-h {
-    font-size: 28px !important;
+    font-size: clamp(24px, 7vw, 40px) !important;
   }
   .hero-sub {
     font-size: 14px !important;
   }
-  /* Topnav — hide brand name on very small screens */
+  /* Landing page hero */
+  .hero-block {
+    padding: 60px 16px 40px !important;
+  }
+  /* Brand name hide on very small screens */
   .brand-name {
     display: none !important;
   }
-  /* Buttons full width on mobile where appropriate */
+  /* Buttons */
   .proceed-btn {
+    font-size: 11px !important;
+    padding: 10px 16px !important;
+  }
+  /* fcard full width */
+  .fcard {
     width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  /* Fix any content that might overflow */
+  * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  /* Exception — don't restrict inline elements */
+  span, a, button {
+    max-width: unset !important;
   }
 }
 @media (max-width: 480px) {
@@ -252,5 +292,8 @@ button { cursor: pointer; font-family: 'JetBrains Mono', monospace; }
   }
   .hero-h {
     font-size: 22px !important;
+  }
+  .topnav {
+    gap: 8px !important;
   }
 }
